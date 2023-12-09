@@ -295,7 +295,7 @@ void ManipulatedSprite::RotateQuadPoints(std::array<Vec2d, 4> points, float rota
 	}
 }
 
-void ManipulatedSprite::Update(olc::PixelGameEngine* pge,Body* body, std::vector<LineData>& linedata, int& count, std::vector<Body*> bodies)
+void ManipulatedSprite::Update(olc::PixelGameEngine* pge,Body* body, std::vector<LineData>& linedata, int& count, std::vector<Body*>& bodies)
 {
 	BoxShape* boxShape = (BoxShape*)body->shape;
 	int i = linedata.size() - 1;
@@ -331,10 +331,10 @@ void ManipulatedSprite::Update(olc::PixelGameEngine* pge,Body* body, std::vector
 
 			Body* body1 = new Body(BoxShape(newSprite1->width, newSprite1->height), 0,
 				body->position.x + vOffset1.x, body->position.y + vOffset1.y, 1.0);
-			body1->sprite = body->sprite;
+			body1->sprite = newSprite1;
 			Body* body2 = new Body(BoxShape(newSprite2->width, newSprite2->height), 0,
 				body->position.x + vOffset2.x, body->position.y + vOffset2.y, 1.0);
-			body2->sprite = body->sprite;
+			body2->sprite = newSprite2;
 
 			if (body1->sprite->width > 0 && body1->sprite->height > 0)
 			{

@@ -43,7 +43,7 @@ Body::Body(const Shape& shape,int index,float x, float y, float mass)
 
 Body::~Body()
 {
-	delete shape;
+	delete &shape;
 	std::cout << "body destroyed!" << std::endl;
 }
 

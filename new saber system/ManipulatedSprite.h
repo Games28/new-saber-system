@@ -37,7 +37,7 @@ public:
 	void RotateQuadPoints(std::array<Vec2d, 4> points, float rotation, Vec2f centerpt);
 
 	//split sprite test
-	void Update(olc::PixelGameEngine* pge, Body* body, std::vector<LineData>& linedata,int& count, std::vector<Body*> bodies);
+	void Update(olc::PixelGameEngine* pge, Body* body, std::vector<LineData>& linedata,int& count, std::vector<Body*>& bodies);
 	bool IsLeft(Vec2i line1, Vec2i line2, Vec2i point);
 	olc::Sprite* TrimToMinimal(olc::Sprite* inputSpritePtr, Vec2i& offset);
 	void SplitSprite(

@@ -7,13 +7,13 @@ void Application::Setup()
 	floor->movementstatic = true;
 	floor->rotationstatic = true;
 	floor->SetTexture("crate.png");
-	Bodies.push_back(floor);
+	//Bodies.push_back(floor);
 	Body* Trooper1 = new Body(BoxShape(162, 273) ,0, 200, 300, 1.0f);
 	Trooper1->SetTexture("trooper.png");
 	Bodies.push_back(Trooper1);
 	Body* Trooper2 = new Body(BoxShape(162, 273), 1, 700, 300, 1.0f);
 	Trooper2->SetTexture("trooper.png");
-	Bodies.push_back(Trooper2);
+	//Bodies.push_back(Trooper2);
 
 	
 
@@ -92,7 +92,19 @@ void Application::Update(float deltatime,olc::PixelGameEngine* ptr)
 	//Bodies[saberindex]->position = Vec2f(ptr->GetMouseX(), ptr->GetMouseY());
 	//Graphics::DrawLineWithData(ptr,ptr->ScreenWidth() / 2, ptr->ScreenHeight() / 2 , Bodies[saberindex]->position.x, Bodies[saberindex]->position.y, 0xffffffff, LineData);
 	Graphics::DrawLineWithData(ptr, ptr->ScreenWidth() / 2, ptr->ScreenHeight() / 2, ptr->GetMouseX(), ptr->GetMouseY(), 0xffffffff, LineData);
+	MS.mousecontrol(ptr, Bodies[mousenumber], mousenumber);
+	if (mousenumber > Bodies.size() - 1)
+	{
+		mousenumber = 0;
+	}
+
 	
+
+	MS.Update(ptr, Bodies[bodynumber], LineData, bodynumber, Bodies);
+	if (bodynumber > Bodies.size() - 1)
+	{
+		bodynumber = 0;
+	}
 	//ptr->DrawRe
 
 	for (int i = 0; i < Bodies.size(); i++)
@@ -103,7 +115,7 @@ void Application::Update(float deltatime,olc::PixelGameEngine* ptr)
 			//body->AddForce(drag);
 
 			Vec2f weight = Vec2f(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-			body->AddForce(weight);
+			//body->AddForce(weight);
 
 			float torque = 200;
 			//body->AddTorque(torque);
@@ -113,30 +125,18 @@ void Application::Update(float deltatime,olc::PixelGameEngine* ptr)
 		
 	}
 
-	
-	
-	MS.mousecontrol(ptr, Bodies[mousenumber],mousenumber);
-	if (mousenumber > Bodies.size() - 1)
-	{
-		mousenumber = 0;
-	}
-
 	for (int i = 0; i < Bodies.size(); i++)
 	{
 		Body* body = Bodies[i];
-		
-		
+
+
 		body->Update(deltatime, index);
 		//MS.Update(ptr, body, LineData, bodynumber);
-		
-	
+
+
 	}
 	
-	MS.Update(ptr, Bodies[bodynumber], LineData, bodynumber,Bodies);
-	if (bodynumber > Bodies.size() - 1)
-	{
-		bodynumber = 0;
-	}
+	
 	
 
 	for (int i = 0; i <= Bodies.size() - 1; i++)
@@ -197,6 +197,7 @@ void Application::Render(olc::PixelGameEngine* ptr)
 			
 
 			MS.Render(ptr,body);
+			//ptr->DrawSprite(body->position.x, body->position.y, body->sprite);
 			for (int i = 0; i < boxShape->worldvertices.size(); i++)
 			{
 			
