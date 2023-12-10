@@ -44,6 +44,7 @@ struct PolygonShape : public Shape
 	virtual ~PolygonShape();
 	Vec2f EdgeAt(int index) const;
 	bool isinsidebox(int index,Vec2i point, float& Npoint);
+	bool isinside2(int index, Vec2i point, float& Npoint);
 	bool isright(int index, Vec2i point);
 	float FindMinSeparation(PolygonShape* other, Vec2f& axis,Vec2f& point);
 	ShapeType GetType() const override;

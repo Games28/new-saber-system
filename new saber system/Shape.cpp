@@ -63,6 +63,7 @@ Vec2f PolygonShape::EdgeAt(int index) const
 
 bool PolygonShape::isinsidebox(int index,Vec2i point,float& Npoint)
 {
+	
 	int currVertex = index;
 	int nextVertex = (index + 1) % worldvertices.size();
 
@@ -70,7 +71,20 @@ bool PolygonShape::isinsidebox(int index,Vec2i point,float& Npoint)
 	Vec2f worldV2 = worldvertices[nextVertex];
 
 	Npoint = (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x);
-	return (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x) < 0;
+	return (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x) > 0;
+}
+
+bool PolygonShape::isinside2(int index, Vec2i point, float& Npoint)
+{
+
+	int currVertex = index;
+	int nextVertex = (index + 1) % worldvertices.size();
+
+	Vec2f worldV1 = worldvertices[currVertex];
+	Vec2f worldV2 = worldvertices[nextVertex];
+
+	Npoint = (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x);
+	return (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x) > 0;
 }
 
 bool PolygonShape::isright(int index, Vec2i point)

@@ -44,10 +44,15 @@ void ManipulatedSprite::Render(olc::PixelGameEngine* pge, Body* body)
 	points[2] = boxShape->worldvertices[1];
 	points[3] = boxShape->worldvertices[0];
 	
-	//Vec2f centerpt = GetQuadCenterpoint(points);
-	//
-	//DrawRotatedWarpedSprite(pge,points,body->rotation,centerpt);
+	olc::Sprite* pWarpedSprite = new olc::Sprite(body->sprite->width, body->sprite->height);
+	//pge->SetDrawTarget(pWarpedSprite);
+
+	//pge->Clear(olc::BLANK);
+
 	DrawWarpedSprite(pge, points,body->sprite);
+
+	//pge->SetDrawTarget(nullptr);
+
 }
 
 void ManipulatedSprite::mousecontrol(olc::PixelGameEngine* pge, Body* body,int& count)
@@ -295,25 +300,45 @@ void ManipulatedSprite::RotateQuadPoints(std::array<Vec2d, 4> points, float rota
 	}
 }
 
-void ManipulatedSprite::Update(olc::PixelGameEngine* pge,Body* body, std::vector<LineData>& linedata, int& count, std::vector<Body*>& bodies)
+void ManipulatedSprite::Update(olc::PixelGameEngine* pge, Body* body, std::vector<LineData>& linedata, int& count, std::vector<Body*>& bodies)
 {
 	BoxShape* boxShape = (BoxShape*)body->shape;
 	int i = linedata.size() - 1;
-	Vec2i mousepos = { linedata[i].x, linedata[i].y};
+	Vec2i mousepos = { linedata[i].x, linedata[i].y };
 	Vec2i mouseorgin = { linedata[0].x, linedata[0].y };
 	olc::Pixel p = olc::BLUE;
-	
+
+	Vec2i ending = Vec2i(begining.x + boxShape->width, 0);
 	for (int i = 0; i < boxShape->worldvertices.size(); i++)
 	{
 		float newpoint;
-	
-		if (boxShape->isinsidebox(i, mousepos ,newpoint)) // < then 0
+
+		if (boxShape->isinsidebox(i, mousepos, newpoint)) // < then 0
 		{
 			p = olc::WHITE;
 			count++;
 		}
-		
+		else
+		{
+			p = olc::GREEN;
+
+
+
+		}
+
 	}
+	if (p == olc::GREEN)
+	{
+		begining = Vec2i(pge->GetMouseX(), pge->GetMouseY());
+	}
+	int sizeX = int((body->position.x - boxShape->width / 2) + boxShape->width);
+	if (pge->GetMouseX() > sizeX)
+	{
+		p = olc::BLUE;
+	}
+
+	
+	pge->DrawString(30, 10, "beginning.x: " + std::to_string(begining.x) + "beginning.y: " + std::to_string(begining.y));
 	pge->DrawLine(pge->ScreenWidth() / 2, pge->ScreenHeight() / 2, mousepos.x + 10, mousepos.y, p);
 
 	std::vector<Body*> tempbody;
@@ -327,14 +352,21 @@ void ManipulatedSprite::Update(olc::PixelGameEngine* pge,Body* body, std::vector
 			olc::Sprite* newSprite2 = nullptr;
 
 			Vec2i vOffset1, vOffset2;
-			SplitSprite(curSprite, body->position, mouseorgin, mousepos, &newSprite1, &newSprite2, vOffset1, vOffset2);
+			int upperleftY, upperrightY, lowerleftY, lowerrightY;
+			SplitSprite(curSprite, body->position, mouseorgin, mousepos, &newSprite1, &newSprite2, vOffset1, vOffset2,upperleftY,upperrightY,lowerleftY,lowerrightY);
 
 			Body* body1 = new Body(BoxShape(newSprite1->width, newSprite1->height), 0,
-				body->position.x + vOffset1.x, body->position.y + vOffset1.y, 1.0);
+				body->position.x - vOffset1.x, body->position.y - vOffset1.y, 1.0);
+			BoxShape* boxShape1 = (BoxShape*)body1->shape;
+			//boxShape1->worldvertices[2] = Vec2()
+
 			body1->sprite = newSprite1;
 			Body* body2 = new Body(BoxShape(newSprite2->width, newSprite2->height), 0,
-				body->position.x + vOffset2.x, body->position.y + vOffset2.y, 1.0);
+				body->position.x - vOffset2.x, body->position.y - vOffset2.y, 1.0);
 			body2->sprite = newSprite2;
+			BoxShape* boxShape2 = (BoxShape*)body2->shape;
+
+
 
 			if (body1->sprite->width > 0 && body1->sprite->height > 0)
 			{
@@ -364,6 +396,11 @@ void ManipulatedSprite::Update(olc::PixelGameEngine* pge,Body* body, std::vector
 	}
 	bodies.clear();
 	
+	for (auto& obj : tempbody)
+	{
+		sabermarks(obj->sprite);
+	}
+
 	bodies = tempbody;
 
 	//for (int i = 0; i < (int)bodies.size(); i++)
@@ -427,7 +464,11 @@ olc::Sprite* ManipulatedSprite::TrimToMinimal(olc::Sprite* inputSpritePtr, Vec2i
 	return resultPtr;
 }
 
-void ManipulatedSprite::SplitSprite(olc::Sprite* org, Vec2i spriteOrigin, Vec2i split1, Vec2i split2, olc::Sprite** newHalf1, olc::Sprite** newHalf2, Vec2i& OffsetHalf1, Vec2i& OffsetHalf2)
+void ManipulatedSprite::SplitSprite(olc::Sprite* org, Vec2i spriteOrigin, Vec2i split1, Vec2i split2, olc::Sprite** newHalf1, olc::Sprite** newHalf2, Vec2i& OffsetHalf1, Vec2i& OffsetHalf2,
+	int& upperleftY,
+	int& uppoerrightY,
+	int& lowerleftY,
+	int& lowerrightY)
 {
 	Vec2i localSprite1 = split1 - spriteOrigin;
 	Vec2i localSprite2 = split2 - spriteOrigin;
@@ -437,20 +478,15 @@ void ManipulatedSprite::SplitSprite(olc::Sprite* org, Vec2i spriteOrigin, Vec2i 
 
 	for (int y = 0; y < org->height; y++)
 	{
-		if (y == org->height -1)
-		{
-			int i = 0;
-		}
+		
 		for (int x = 0; x < org->width; x++)
 		{
 			Vec2i pixPos = { x,y };
 			olc::Pixel curPix = org->GetPixel(x, y);
-			if (x == org->width - 1)
-			{
-				int i = 0;
-			}
+		
 			if (IsLeft(localSprite1, localSprite2, pixPos))
 			{
+
 				(*newHalf1)->SetPixel(x, y, curPix);
 				(*newHalf2)->SetPixel(x, y, olc::BLANK);
 
@@ -470,6 +506,49 @@ void ManipulatedSprite::SplitSprite(olc::Sprite* org, Vec2i spriteOrigin, Vec2i 
 	olc::Sprite* pTmpPtr2 = TrimToMinimal(*newHalf2, OffsetHalf2);
 	delete* newHalf2;
 	*newHalf2 = pTmpPtr2;
+}
+
+void ManipulatedSprite::sabermarks(olc::Sprite* sprite)
+{
+	olc::Pixel p1 = olc::DARK_RED;
+	olc::Pixel p = olc::DARK_YELLOW;
+
+	for (int y = 0; y < sprite->height; y++)
+	{
+		for (int x = 0; x < sprite->width; x++)
+		{
+
+			if (sprite->GetPixel(x, y) == olc::BLANK)
+			{
+
+				if (sprite->GetPixel(x - 1, y) != olc::BLANK && sprite->GetPixel(x - 1, y) != olc::MAGENTA)
+				{
+					int i = 0;
+					sprite->SetPixel(x - 1, y, p);
+					sprite->SetPixel(x - 2, y, p1);
+				}
+				if (sprite->GetPixel(x, y - 1) != olc::BLANK && sprite->GetPixel(x, y - 1) != olc::MAGENTA)
+				{
+					int  i = 0;
+					sprite->SetPixel(x, y - 1, p);
+					sprite->SetPixel(x, y - 2, p1);
+				}
+				if (sprite->GetPixel(x, y + 1) != olc::BLANK && sprite->GetPixel(x, y + 1) != olc::MAGENTA)
+				{
+					int  i = 0;
+					sprite->SetPixel(x, y + 1, p);
+					sprite->SetPixel(x, y + 2, p1);
+				}
+				if (sprite->GetPixel(x + 1, y) != olc::BLANK && sprite->GetPixel(x + 1, y) != olc::MAGENTA)
+				{
+					int  i = 0;
+					sprite->SetPixel(x + 1, y, p);
+					sprite->SetPixel(x + 2, y, p1);
+				}
+			}
+
+		}
+	}
 }
 
 

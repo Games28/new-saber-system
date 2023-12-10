@@ -22,6 +22,7 @@ public:
 	Vec2f partSize = { 1.0f, 1.0f };
 	Vec2f* pSelected = nullptr;
 	int index = 0;
+	Vec2i begining;
 public:
 
 	void ScaleSprite(olc::Sprite* orgSprite, olc::Sprite** activeSpr, int nScale);
@@ -48,10 +49,14 @@ public:
 		olc::Sprite** newHalf1,
 		olc::Sprite** newHalf2,
 		Vec2i& OffsetHalf1,
-		Vec2i& OffsetHalf2
+		Vec2i& OffsetHalf2,
+		int& upperleftY,
+		int& uppoerrightY,
+		int& lowerleftY,
+		int& lowerrightY
 	);
 	
-
+	void sabermarks(olc::Sprite* sprite);
 
 };
 

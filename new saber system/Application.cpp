@@ -23,7 +23,7 @@ void Application::Setup()
 	Saber->SetTexture("saber.png");
 	//Bodies.push_back(Saber);
 	
-	//saberindex = Bodies.size() - 1;
+	
 	for (int i = 0; i < Bodies.size(); i++)
 	{
 		MS.Setup(Bodies[i]);
@@ -34,22 +34,22 @@ void Application::Setup()
 void Application::Input(olc::PixelGameEngine* ptr)
 {
 	if (ptr->GetKey(olc::W).bHeld)
-		Bodies[1]->velocity.y = -50;
+		Bodies[saberindex]->velocity.y = -50;
 	if (ptr->GetKey(olc::S).bHeld)
-		Bodies[1]->velocity.y = +50;
+		Bodies[saberindex]->velocity.y = +50;
 	if (ptr->GetKey(olc::A).bHeld)
-		Bodies[1]->velocity.x = -50;
+		Bodies[saberindex]->velocity.x = -50;
 	if (ptr->GetKey(olc::D).bHeld)
-		Bodies[1]->velocity.x = +50;
+		Bodies[saberindex]->velocity.x = +50;
 
 	if (ptr->GetKey(olc::W).bReleased)
-		Bodies[1]->velocity.y = 0;
+		Bodies[saberindex]->velocity.y = 0;
 	if (ptr->GetKey(olc::S).bReleased)
-		Bodies[1]->velocity.y = 0;
+		Bodies[saberindex]->velocity.y = 0;
 	if (ptr->GetKey(olc::A).bReleased)
-		Bodies[1]->velocity.x = 0;
+		Bodies[saberindex]->velocity.x = 0;
 	if (ptr->GetKey(olc::D).bReleased)
-		Bodies[1]->velocity.x = 0;
+		Bodies[saberindex]->velocity.x = 0;
     
 	if (ptr->GetKey(olc::LEFT).bHeld)  
 		Bodies[saberindex]->angularvelocity = -1.0;
@@ -101,6 +101,7 @@ void Application::Update(float deltatime,olc::PixelGameEngine* ptr)
 	
 
 	MS.Update(ptr, Bodies[bodynumber], LineData, bodynumber, Bodies);
+	saberindex = Bodies.size() - 1;
 	if (bodynumber > Bodies.size() - 1)
 	{
 		bodynumber = 0;
