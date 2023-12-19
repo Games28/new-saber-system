@@ -32,21 +32,28 @@ struct Body
 	olc::Decal* decal = nullptr;
 	Shape* shape = nullptr;
 	Body() = default;
-	Body(const Shape& shape,int index,float x, float y, float mass);
+	Body(const Shape& shape,float x, float y, float mass);
 	~Body();
-	void integrateLinear(float deltatime);
-	void integrateAngular(float deltatime);
+	
 	void AddForce(const Vec2f& force);
 	void AddTorque(float torque);
+
 	void ClearTorgue();
 	void ClearForces();
+
 	bool IsStatic() const;
-	void ApplyImpulse(const Vec2f& j);
-	void ApplyImpulse(const Vec2f& j, const Vec2f& r);
+
+	Vec2f LocalSpaceToWorldSpace(const Vec2f& point) const;
+	Vec2f WorldSpaceToLocalSpace(const Vec2f& point) const;
+
+	void ApplyImpulseLinear(const Vec2f& j);
+	void ApplyImpulseAngular(const float j);
+	void ApplyImpulseAtPoint(const Vec2f& j, const Vec2f& r);
+
 	void SetTexture(const char* textureFileName);
-	void Update(float deltatime, int index);
-	void Cutline(olc::PixelGameEngine* pge, std::vector<LineData>& linedata);
-	bool isleft(int index, Vec2i point);
+	
+	void IntegrateForces(const float dt);
+	void IntegrateVelocities(const float dt);
 };
 #endif // !body_H
 

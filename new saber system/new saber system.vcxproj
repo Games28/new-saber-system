@@ -130,26 +130,36 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
+    <ClCompile Include="Constraint.cpp" />
     <ClCompile Include="Contact.cpp" />
     <ClCompile Include="Force.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="ManipulatedSprite.cpp" />
+    <ClCompile Include="MatMN.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="source.cpp" />
     <ClCompile Include="Vec2.cpp" />
+    <ClCompile Include="VecF.cpp" />
+    <ClCompile Include="VecN.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Body.h" />
     <ClInclude Include="CollisionDetection.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="Constraint.h" />
     <ClInclude Include="Contact.h" />
     <ClInclude Include="Force.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="ManipulatedSprite.h" />
+    <ClInclude Include="MatMN.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Vec2.h" />
+    <ClInclude Include="VecF.h" />
+    <ClInclude Include="VecN.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

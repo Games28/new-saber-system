@@ -37,6 +37,11 @@ float CircleShape::GetMomentOfInertia() const
 	return 0.5f * ( radius * radius);
 }
 
+void CircleShape::UpdateVertices(float angle, const Vec2f& position)
+{
+	return;
+}
+
 PolygonShape::PolygonShape(const std::vector<Vec2f> vertices)
 {
 	for (auto vertex : vertices)
@@ -59,44 +64,6 @@ Vec2f PolygonShape::EdgeAt(int index) const
 	int nextVertex = (index + 1) % worldvertices.size();
 
 	return worldvertices[nextVertex] - worldvertices[currVertex];
-}
-
-bool PolygonShape::isinsidebox(int index,Vec2i point,float& Npoint)
-{
-	
-	int currVertex = index;
-	int nextVertex = (index + 1) % worldvertices.size();
-
-	Vec2f worldV1 = worldvertices[currVertex];
-	Vec2f worldV2 = worldvertices[nextVertex];
-
-	Npoint = (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x);
-	return (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x) > 0;
-}
-
-bool PolygonShape::isinside2(int index, Vec2i point, float& Npoint)
-{
-
-	int currVertex = index;
-	int nextVertex = (index + 1) % worldvertices.size();
-
-	Vec2f worldV1 = worldvertices[currVertex];
-	Vec2f worldV2 = worldvertices[nextVertex];
-
-	Npoint = (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x);
-	return (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x) > 0;
-}
-
-bool PolygonShape::isright(int index, Vec2i point)
-{
-	int currVertex = index;
-	int nextVertex = (index + 1) % worldvertices.size();
-
-	Vec2f worldV1 = worldvertices[currVertex];
-	Vec2f worldV2 = worldvertices[nextVertex];
-
-
-	return (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x) > 0;
 }
 
 float PolygonShape::FindMinSeparation(PolygonShape* other, Vec2f& axis, Vec2f& point)
@@ -151,16 +118,18 @@ float PolygonShape::GetMomentOfInertia() const
 	return 5000;
 }
 
-void PolygonShape::UpdatePolygonVertices(float angle, const Vec2f& position)
+
+
+void PolygonShape::UpdateVertices(float angle, const Vec2f& position)
 {
 	for (int i = 0; i < localvertices.size(); i++)
 	{
-		Vec2f zero = { 0,0 };
+
 		worldvertices[i] = localvertices[i].Rotate(angle);
-		
-		
+
+
 		worldvertices[i] += position;
-		
+
 	}
 }
 
@@ -205,15 +174,3 @@ float BoxShape::GetMomentOfInertia() const
 	return (0.083333) * (width * width + height * height);
 }
 
-void BoxShape::UpdateBoxVertices(float angle, const Vec2f& position)
-{
-	for (int i = 0; i < localvertices.size(); i++)
-	{
-		Vec2f zero = { 0,0 };
-		worldvertices[i] = localvertices[i].Rotate(angle) + offsetverts[i].Rotate(angle);
-
-
-		worldvertices[i] += position;
-
-	}
-}

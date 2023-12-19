@@ -17,6 +17,7 @@ struct Shape
 	virtual ShapeType GetType() const = 0;
 	virtual Shape* Clone() const = 0;
 	virtual float GetMomentOfInertia() const = 0;
+	virtual void UpdateVertices(float angle, const Vec2f& position) = 0;
 	int verticindex = 0;
 	int bodyindex = 0;
 
@@ -32,6 +33,7 @@ struct CircleShape : public Shape
 	ShapeType GetType() const override; 
 	Shape* Clone() const override;
 	float GetMomentOfInertia() const override;
+	void UpdateVertices(float angle, const Vec2f& position) override;
 };
 
 struct PolygonShape : public Shape
@@ -43,14 +45,12 @@ struct PolygonShape : public Shape
 	PolygonShape(const std::vector<Vec2f> vertices);
 	virtual ~PolygonShape();
 	Vec2f EdgeAt(int index) const;
-	bool isinsidebox(int index,Vec2i point, float& Npoint);
-	bool isinside2(int index, Vec2i point, float& Npoint);
-	bool isright(int index, Vec2i point);
 	float FindMinSeparation(PolygonShape* other, Vec2f& axis,Vec2f& point);
 	ShapeType GetType() const override;
 	Shape* Clone() const override;
 	float GetMomentOfInertia() const override;
-	void UpdatePolygonVertices(float angle, const Vec2f& position);
+	
+	void UpdateVertices(float angle, const Vec2f& position) override;
 };
 
 struct BoxShape : public PolygonShape
@@ -63,7 +63,7 @@ struct BoxShape : public PolygonShape
 	ShapeType GetType() const override;
 	Shape* Clone() const override;
 	float GetMomentOfInertia() const override;
-	void UpdateBoxVertices(float angle, const Vec2f& position);
+	
 };
 #endif // !SHAPE_H
 

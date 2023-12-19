@@ -2,32 +2,64 @@
 
 void Application::Setup()
 {
-	Body* floor = new Body(BoxShape(800 - 50, 50), 0, 400, 500, 0.0f);
-	floor->restitution = 0.5f;
-	floor->movementstatic = true;
-	floor->rotationstatic = true;
+	world = new World(-9.8f);
+
+	Body* bob = new Body(BoxShape(10, 10), Graphics::width / 2.0, Graphics::height / 2.0 - 200, 0.0);
+	Body* head = new Body(BoxShape(50, 50), bob->position.x, bob->position.y + 70, 5.0);
+	Body* torso = new Body(BoxShape(50, 100), head->position.x, head->position.y + 80, 3.0);
+	Body* lowertorso = new Body(BoxShape(50, 30), torso->position.x, torso->position.y + 70, 3.0f);
+	Body* leftArm = new Body(BoxShape(25, 70), torso->position.x - 32, torso->position.y - 10, 1.0);
+	Body* rightArm = new Body(BoxShape(25, 70), torso->position.x + 32, torso->position.y - 10, 1.0);
+	Body* leftLeg = new Body(BoxShape(30, 90), lowertorso->position.x - 20, lowertorso->position.y + 60, 1.0);
+	Body* rightLeg = new Body(BoxShape(30, 90), lowertorso->position.x + 20, lowertorso->position.y + 60, 1.0);
+	//bob->SetTexture("bob.png");
+	
+	head->SetTexture("mandohead.png");
+
+	torso->SetTexture("mandotorse.png");
+	lowertorso->SetTexture("mandolowertorso.png");
+	leftArm->SetTexture("mandoleftArm.png");
+	rightArm->SetTexture("mandorightArm.png");
+	leftLeg->SetTexture("mandoleftLeg.png");
+	rightLeg->SetTexture("mandorightLeg.png");
+	world->AddBody(bob);
+	world->AddBody(head);
+	world->AddBody(torso);
+	world->AddBody(lowertorso);
+	world->AddBody(leftArm);
+	world->AddBody(rightArm);
+	world->AddBody(leftLeg);
+	world->AddBody(rightLeg);
+
+	// Add joints between ragdoll parts (distance constraints with one anchor point)
+	JointConstraint* string = new JointConstraint(bob, head, bob->position);
+	JointConstraint* neck = new JointConstraint(head, torso, head->position + Vec2f(0, 25));
+	JointConstraint* leftShoulder = new JointConstraint(torso, leftArm, torso->position + Vec2f(-28, -45));
+	JointConstraint* rightShoulder = new JointConstraint(torso, rightArm, torso->position + Vec2f(+28, -45));
+	JointConstraint* waist = new JointConstraint(torso, lowertorso, lowertorso->position + Vec2f(0, -20));
+	JointConstraint* leftHip = new JointConstraint(lowertorso, leftLeg, lowertorso->position + Vec2f(-10, 0));
+	JointConstraint* rightHip = new JointConstraint(lowertorso, rightLeg, lowertorso->position + Vec2f(+10,0));
+	world->AddConstraint(string);
+	world->AddConstraint(neck);
+	
+	world->AddConstraint(leftShoulder);
+	world->AddConstraint(rightShoulder);
+	world->AddConstraint(waist);
+	world->AddConstraint(leftHip);
+	world->AddConstraint(rightHip);
+
+	// Add a floor and walls to contain objects objects
+	Body* floor = new Body(BoxShape(Graphics::width - 50, 50), Graphics::width / 2.0, Graphics::height - 50, 0.0);
+	Body* leftWall = new Body(BoxShape(50, Graphics::height - 100), 50, Graphics::height / 2.0 - 25, 0.0);
+	Body* rightWall = new Body(BoxShape(50, Graphics::height - 100), Graphics::width - 50, Graphics::height / 2.0 - 25, 0.0);
+	floor->restitution = 0.7;
+	leftWall->restitution = 0.2;
+	rightWall->restitution = 0.2;
 	floor->SetTexture("crate.png");
-	//Bodies.push_back(floor);
-	Body* Trooper1 = new Body(BoxShape(162, 273) ,0, 200, 300, 1.0f);
-	Trooper1->SetTexture("trooper.png");
-	Bodies.push_back(Trooper1);
-	Body* Trooper2 = new Body(BoxShape(162, 273), 1, 700, 300, 1.0f);
-	Trooper2->SetTexture("trooper.png");
-	//Bodies.push_back(Trooper2);
-
-	
-
-	Body* Saber = new Body(BoxShape(32, 402), 3, 400, 300, 0.0f);
-	Saber->movementstatic = true;
-	
-	Saber->SetTexture("saber.png");
-	//Bodies.push_back(Saber);
-	
-	
-	for (int i = 0; i < Bodies.size(); i++)
-	{
-		MS.Setup(Bodies[i]);
-	}
+	leftWall->SetTexture("head.png");
+	world->AddBody(floor);
+	world->AddBody(leftWall);
+	world->AddBody(rightWall);
 	
 }
 
@@ -72,12 +104,18 @@ void Application::Input(olc::PixelGameEngine* ptr)
 			Vec2f(20, -60),
 			Vec2f(40,20)
 		};
-		Body* poly = new Body(PolygonShape(vertices),1, x, y, 2.0);
+		Body* poly = new Body(PolygonShape(vertices), x, y, 2.0);
 		//poly->restitution = 0.1f;
 		poly->friction = 0.7f;
 		
 		Bodies.push_back(poly);
 	}
+
+	Vec2f mouse = Vec2f((int)ptr->GetMouseX(), (int)ptr->GetMouseY());
+	Body* bob = world->GetBodies()[0];
+	Vec2f direction = (mouse - bob->position).Normalize();
+	float speed = 5.0f;
+	bob->position += direction * speed;
 	
 }
 
@@ -88,97 +126,29 @@ void Application::Update(float deltatime,olc::PixelGameEngine* ptr)
 		deltatime = 0.017f;
 	}
 	LineData.clear();
-	BoxShape* boxShape = (BoxShape*)Bodies[saberindex]->shape;
+	//BoxShape* boxShape = (BoxShape*)Bodies[saberindex]->shape;
 	//Bodies[saberindex]->position = Vec2f(ptr->GetMouseX(), ptr->GetMouseY());
 	//Graphics::DrawLineWithData(ptr,ptr->ScreenWidth() / 2, ptr->ScreenHeight() / 2 , Bodies[saberindex]->position.x, Bodies[saberindex]->position.y, 0xffffffff, LineData);
-	Graphics::DrawLineWithData(ptr, ptr->ScreenWidth() / 2, ptr->ScreenHeight() / 2, ptr->GetMouseX(), ptr->GetMouseY(), 0xffffffff, LineData);
-	MS.mousecontrol(ptr, Bodies[mousenumber], mousenumber);
-	if (mousenumber > Bodies.size() - 1)
-	{
-		mousenumber = 0;
-	}
-
+	//Graphics::DrawLineWithData(ptr, ptr->ScreenWidth() / 2, ptr->ScreenHeight() / 2, ptr->GetMouseX(), ptr->GetMouseY(), 0xffffffff, LineData);
+	//MS.mousecontrol(ptr, Bodies[mousenumber], mousenumber);
 	
-
-	MS.Update(ptr, Bodies[bodynumber], LineData, bodynumber, Bodies);
-	saberindex = Bodies.size() - 1;
-	if (bodynumber > Bodies.size() - 1)
-	{
-		bodynumber = 0;
-	}
-	//ptr->DrawRe
-
-	for (int i = 0; i < Bodies.size(); i++)
-	{
-		Body* body = Bodies[i];
-		
-			Vec2f drag = Force::GenerateDragForce(*body, 0.002f);
-			//body->AddForce(drag);
-
-			Vec2f weight = Vec2f(0.0f, body->mass * 9.8f * PIXELS_PER_METER);
-			//body->AddForce(weight);
-
-			float torque = 200;
-			//body->AddTorque(torque);
-
-			Vec2f wind = Vec2f(2.0f * PIXELS_PER_METER, 0.0f);
-			//body->AddForce(wind);
-		
-	}
-
-	for (int i = 0; i < Bodies.size(); i++)
-	{
-		Body* body = Bodies[i];
-
-
-		body->Update(deltatime, index);
-		//MS.Update(ptr, body, LineData, bodynumber);
-
-
-	}
-	
-	
-	
-
-	for (int i = 0; i <= Bodies.size() - 1; i++)
-	{
-		for (int j = i + 1; j < Bodies.size(); j++)
-		{
-			//if (i != saberindex && j != saberindex)
-			{
-				Body* a = Bodies[i];
-				Body* b = Bodies[j];
-				Contact contact;
-				a->isColliding = false;
-				b->isColliding = false;
-				if (CollisionDetection::IsColliding(a, b, contact))
-				{
-					contact.ResolveCollision();
-					if (debug)
-					{
-						ptr->DrawCircle(contact.start.x, contact.start.y, 3, olc::DARK_MAGENTA);
-						ptr->DrawCircle(contact.end.x, contact.end.y, 3, olc::DARK_MAGENTA);
-						ptr->DrawLine(contact.start.x, contact.start.y, contact.end.x, contact.end.y, olc::DARK_MAGENTA);
-						a->isColliding = true;
-						b->isColliding = true;
-					}
-
-
-				}
-			}
-		}
-	}
-
+	world->Update(ptr, deltatime);
 	
 }
 
 void Application::Render(olc::PixelGameEngine* ptr)
 {
-
-	
-	for (int j = 0; j < Bodies.size(); j++)
+	for (auto joint : world->GetConstraints())
 	{
-		Body* body = Bodies[j];
+		const Vec2f pa = joint->a->LocalSpaceToWorldSpace(joint->aPoint);
+		const Vec2f pb = joint->b->LocalSpaceToWorldSpace(joint->bPoint);
+		Graphics::DrawLine(ptr, pa.x, pa.y, pb.x, pb.y, 0xff555555);
+
+	}
+	
+	for (auto& body : world->GetBodies())
+	{
+		
 		if (body->shape->GetType() == CIRCLE)
 		{
 			
@@ -196,20 +166,22 @@ void Application::Render(olc::PixelGameEngine* ptr)
 			
 			
 			
-
-			MS.Render(ptr,body);
-			//ptr->DrawSprite(body->position.x, body->position.y, body->sprite);
-			for (int i = 0; i < boxShape->worldvertices.size(); i++)
+			if (body->sprite != nullptr)
 			{
-			
-				
-			
-					
-					ptr->FillCircle({ int(boxShape->worldvertices[i].x),int(boxShape->worldvertices[i].y) }, 7, olc::CYAN);
+				MS.Render(ptr, body);
 			}
+			//ptr->DrawSprite(body->position.x, body->position.y, body->sprite);
+			//for (int i = 0; i < boxShape->worldvertices.size(); i++)
+			//{
+			//
+			//	
+			//
+			//		
+			//		ptr->FillCircle({ int(boxShape->worldvertices[i].x),int(boxShape->worldvertices[i].y) }, 7, olc::CYAN);
+			//}
 			
 			
-			Graphics::DrawPolygon(ptr, body->position.x, body->position.y, boxShape->worldvertices, 0xff00ff00);
+			//Graphics::DrawPolygon(ptr, body->position.x, body->position.y, boxShape->worldvertices, 0xff00ff00);
 			
 			
 		}

@@ -39,7 +39,7 @@ void Graphics::DrawLineWithData(olc::PixelGameEngine* pge, int x0, int y0, int x
 
 	for (int i = 0; i <= longest_side_length; i++)
 	{
-		LineData data = { (int)current_x,(int)current_y,olc::BLUE };
+		LineData data = { (int)current_x,(int)current_y };
 		linedata.push_back(data);
 		//pge->Draw(round(current_x), round(current_y), color);
 		current_x += x_inc;

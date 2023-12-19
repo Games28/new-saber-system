@@ -44,8 +44,14 @@ void ManipulatedSprite::Render(olc::PixelGameEngine* pge, Body* body)
 	points[2] = boxShape->worldvertices[1];
 	points[3] = boxShape->worldvertices[0];
 	
-	olc::Sprite* pWarpedSprite = new olc::Sprite(body->sprite->width, body->sprite->height);
+	//olc::Sprite* pWarpedSprite = new olc::Sprite(body->sprite->width, body->sprite->height);
+
+	
 	//pge->SetDrawTarget(pWarpedSprite);
+
+	
+
+	
 
 	//pge->Clear(olc::BLANK);
 
@@ -302,106 +308,106 @@ void ManipulatedSprite::RotateQuadPoints(std::array<Vec2d, 4> points, float rota
 
 void ManipulatedSprite::Update(olc::PixelGameEngine* pge, Body* body, std::vector<LineData>& linedata, int& count, std::vector<Body*>& bodies)
 {
-	BoxShape* boxShape = (BoxShape*)body->shape;
-	int i = linedata.size() - 1;
-	Vec2i mousepos = { linedata[i].x, linedata[i].y };
-	Vec2i mouseorgin = { linedata[0].x, linedata[0].y };
-	olc::Pixel p = olc::BLUE;
-
-	Vec2i ending = Vec2i(begining.x + boxShape->width, 0);
-	for (int i = 0; i < boxShape->worldvertices.size(); i++)
-	{
-		float newpoint;
-
-		if (boxShape->isinsidebox(i, mousepos, newpoint)) // < then 0
-		{
-			p = olc::WHITE;
-			count++;
-		}
-		else
-		{
-			p = olc::GREEN;
-
-
-
-		}
-
-	}
-	if (p == olc::GREEN)
-	{
-		begining = Vec2i(pge->GetMouseX(), pge->GetMouseY());
-	}
-	int sizeX = int((body->position.x - boxShape->width / 2) + boxShape->width);
-	if (pge->GetMouseX() > sizeX)
-	{
-		p = olc::BLUE;
-	}
+	//BoxShape* boxShape = (BoxShape*)body->shape;
+	//int i = linedata.size() - 1;
+	//Vec2i mousepos = { linedata[i].x, linedata[i].y };
+	//Vec2i mouseorgin = { linedata[0].x, linedata[0].y };
+	//olc::Pixel p = olc::BLUE;
+	//
+	//Vec2i ending = Vec2i(begining.x + boxShape->width, 0);
+	//for (int i = 0; i < boxShape->worldvertices.size(); i++)
+	//{
+	//	float newpoint;
+	//
+	//	if (boxShape->isinsidebox(i, mousepos, newpoint)) // < then 0
+	//	{
+	//		p = olc::WHITE;
+	//		count++;
+	//	}
+	//	else
+	//	{
+	//		p = olc::GREEN;
+	//
+	//
+	//
+	//	}
+	//
+	//}
+	//if (p == olc::GREEN)
+	//{
+	//	begining = Vec2i(pge->GetMouseX(), pge->GetMouseY());
+	//}
+	//int sizeX = int((body->position.x - boxShape->width / 2) + boxShape->width);
+	//if (pge->GetMouseX() > sizeX)
+	//{
+	//	p = olc::BLUE;
+	//}
 
 	
-	pge->DrawString(30, 10, "beginning.x: " + std::to_string(begining.x) + "beginning.y: " + std::to_string(begining.y));
-	pge->DrawLine(pge->ScreenWidth() / 2, pge->ScreenHeight() / 2, mousepos.x + 10, mousepos.y, p);
+	//pge->DrawString(30, 10, "beginning.x: " + std::to_string(begining.x) + "beginning.y: " + std::to_string(begining.y));
+	//pge->DrawLine(pge->ScreenWidth() / 2, pge->ScreenHeight() / 2, mousepos.x + 10, mousepos.y, p);
+	//
+	//std::vector<Body*> tempbody;
+	//for (int i = 0; i < (int)bodies.size(); i++)
+	//{
+	//	Body* body = bodies[i];
+	//	if (pge->GetKey(olc::Key::SPACE).bPressed)
+	//	{
+	//		olc::Sprite* curSprite = body->sprite;
+	//		olc::Sprite* newSprite1 = nullptr;
+	//		olc::Sprite* newSprite2 = nullptr;
+	//
+	//		Vec2i vOffset1, vOffset2;
+	//		int upperleftY, upperrightY, lowerleftY, lowerrightY;
+	//		SplitSprite(curSprite, body->position, mouseorgin, mousepos, &newSprite1, &newSprite2, vOffset1, vOffset2,upperleftY,upperrightY,lowerleftY,lowerrightY);
+	//
+	//		Body* body1 = new Body(BoxShape(newSprite1->width, newSprite1->height), 0,
+	//			body->position.x, body->position.y, 1.0);
+	//		BoxShape* boxShape1 = (BoxShape*)body1->shape;
+	//		//boxShape1->worldvertices[2] = Vec2()
+	//
+	//		body1->sprite = newSprite1;
+	//		Body* body2 = new Body(BoxShape(newSprite2->width, newSprite2->height), 0,
+	//			body->position.x , body->position.y, 1.0);
+	//		body2->sprite = newSprite2;
+	//		BoxShape* boxShape2 = (BoxShape*)body2->shape;
+	//
+	//
+	//
+	//		if (body1->sprite->width > 0 && body1->sprite->height > 0)
+	//		{
+	//			tempbody.push_back(body1);
+	//		}
+	//		else
+	//		{
+	//			delete body1->sprite;
+	//		}
+	//
+	//		if (body2->sprite->width > 0 && body2->sprite->height > 0)
+	//		{
+	//			tempbody.push_back(body2);
+	//		}
+	//		else
+	//		{
+	//			delete body2->sprite;
+	//		}
+	//		delete curSprite;
+	//		
+	//	}
+	//	else
+	//	{
+	//		tempbody.push_back(bodies[i]);
+	//	}
+	//
+	//}
+	//bodies.clear();
+	//
+	//for (auto& obj : tempbody)
+	//{
+	//	sabermarks(obj->sprite);
+	//}
 
-	std::vector<Body*> tempbody;
-	for (int i = 0; i < (int)bodies.size(); i++)
-	{
-		Body* body = bodies[i];
-		if (pge->GetKey(olc::Key::SPACE).bPressed)
-		{
-			olc::Sprite* curSprite = body->sprite;
-			olc::Sprite* newSprite1 = nullptr;
-			olc::Sprite* newSprite2 = nullptr;
-
-			Vec2i vOffset1, vOffset2;
-			int upperleftY, upperrightY, lowerleftY, lowerrightY;
-			SplitSprite(curSprite, body->position, mouseorgin, mousepos, &newSprite1, &newSprite2, vOffset1, vOffset2,upperleftY,upperrightY,lowerleftY,lowerrightY);
-
-			Body* body1 = new Body(BoxShape(newSprite1->width, newSprite1->height), 0,
-				body->position.x - vOffset1.x, body->position.y - vOffset1.y, 1.0);
-			BoxShape* boxShape1 = (BoxShape*)body1->shape;
-			//boxShape1->worldvertices[2] = Vec2()
-
-			body1->sprite = newSprite1;
-			Body* body2 = new Body(BoxShape(newSprite2->width, newSprite2->height), 0,
-				body->position.x - vOffset2.x, body->position.y - vOffset2.y, 1.0);
-			body2->sprite = newSprite2;
-			BoxShape* boxShape2 = (BoxShape*)body2->shape;
-
-
-
-			if (body1->sprite->width > 0 && body1->sprite->height > 0)
-			{
-				tempbody.push_back(body1);
-			}
-			else
-			{
-				delete body1->sprite;
-			}
-
-			if (body2->sprite->width > 0 && body2->sprite->height > 0)
-			{
-				tempbody.push_back(body2);
-			}
-			else
-			{
-				delete body2->sprite;
-			}
-			delete curSprite;
-			
-		}
-		else
-		{
-			tempbody.push_back(bodies[i]);
-		}
-	
-	}
-	bodies.clear();
-	
-	for (auto& obj : tempbody)
-	{
-		sabermarks(obj->sprite);
-	}
-
-	bodies = tempbody;
+	//bodies = tempbody;
 
 	//for (int i = 0; i < (int)bodies.size(); i++)
 	//{

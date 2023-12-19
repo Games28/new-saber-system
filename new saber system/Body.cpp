@@ -1,10 +1,10 @@
 #include "Body.h"
 #include <iostream>
 
-Body::Body(const Shape& shape,int index,float x, float y, float mass)
+Body::Body(const Shape& shape,float x, float y, float mass)
 {
 	this->shape = shape.Clone();
-	this->bodyindex = index;
+	
 	//linear motion
 	this->position = Vec2f(x, y);
 	this->velocity = Vec2f(0, 0);
@@ -37,47 +37,16 @@ Body::Body(const Shape& shape,int index,float x, float y, float mass)
 	{
 		this->invInertia = 0.0f;
 	}
-
+	this->shape->UpdateVertices(rotation, position);
 	std::cout << "body constructed!" << std::endl;
 }
 
 Body::~Body()
 {
-	delete &shape;
+	delete shape;
 	std::cout << "body destroyed!" << std::endl;
 }
 
-void Body::integrateLinear(float deltatime)
-{
-	if (movementstatic)
-	{
-		return;
-	}
-
-	acceleration = sumForces * invMass;
-	
-	velocity += acceleration * deltatime;
-
-	position += velocity * deltatime;
-
-	ClearForces();
-}
-
-void Body::integrateAngular(float deltatime)
-{
-	if (rotationstatic)
-	{
-		return;
-	}
-
-	angularacceleration = sumTorque * invInertia;
-
-	angularvelocity += angularacceleration * deltatime;
-
-	rotation += angularvelocity * deltatime;
-
-	ClearTorgue();
-}
 
 void Body::AddForce(const Vec2f& force)
 {
@@ -107,14 +76,36 @@ bool Body::IsStatic() const
 	return result;
 }
 
-void Body::ApplyImpulse(const Vec2f& j)
+Vec2f Body::LocalSpaceToWorldSpace(const Vec2f& point) const
+{
+	Vec2f rotated = point.Rotate(rotation);
+	return rotated + position;
+}
+
+Vec2f Body::WorldSpaceToLocalSpace(const Vec2f& point) const
+{
+	float translatedX = point.x - position.x;
+	float translatedY = point.y - position.y;
+	float rotatedX = cos(-rotation) * translatedX - sin(-rotation) * translatedY;
+	float rotatedY = cos(-rotation) * translatedY + sin(-rotation) * translatedX;
+	return Vec2f(rotatedX, rotatedY);
+}
+
+void Body::ApplyImpulseAngular(const float j)
+{
+	if (rotationstatic) return;
+
+	angularvelocity += j * invInertia;
+}
+
+void Body::ApplyImpulseLinear(const Vec2f& j)
 {
 	if (movementstatic) return;
 
 	velocity += j * invMass;
 }
 
-void Body::ApplyImpulse(const Vec2f& j, const Vec2f& r)
+void Body::ApplyImpulseAtPoint(const Vec2f& j, const Vec2f& r)
 {
 	if (movementstatic || rotationstatic) return;
 
@@ -128,66 +119,48 @@ void Body::SetTexture(const char* textureFileName)
 	decal = new olc::Decal(sprite);
 }
 
-void Body::Update(float deltatime, int index)
+void Body::IntegrateForces(const float dt)
 {
-	integrateLinear(deltatime);
-	integrateAngular(deltatime);
-	bool isPolygon = shape->GetType() == POLYGON;
-	bool isBox = shape->GetType() == BOX;
-
-	if (isPolygon)
-	{
-		PolygonShape* polygonshape = (PolygonShape*)shape;
-		
-		polygonshape->UpdatePolygonVertices(rotation, position);
-	}
-	if (isBox)
-	{
-		BoxShape* boxshape = (BoxShape*)shape;
-		boxshape->UpdateBoxVertices(rotation, position);
-	}
-}
-
-void Body::Cutline(olc::PixelGameEngine* pge, std::vector<LineData>& linedata)
-{
-	BoxShape* boxshape = (BoxShape*)shape;
 	
-	int i = linedata.size() - 1;
-	Vec2i mousepos = { linedata[i].x, linedata[i].y };
-	olc::Pixel p = olc::BLUE;
-	if (this->isleft(0, mousepos))
+	if (!movementstatic)
 	{
-		p = olc::WHITE;
+		acceleration = sumForces * invMass;
+		velocity += acceleration * dt;
 	}
-	float newpoint1;
-	if (this->isleft(1, mousepos))
+	else
 	{
-		p = olc::WHITE;
-	}
-	float newpoint2;
-	if (this->isleft(2, mousepos))
-	{
-		p = olc::WHITE;
-	}
-	float newpoint3;
-	if (this->isleft(3, mousepos))
-	{
-		p = olc::WHITE;
+		return;
 	}
 
-	pge->DrawLine(pge->ScreenWidth() / 2, pge->ScreenHeight() / 2, mousepos.x + 10, mousepos.y, p);
+	if (!rotationstatic)
+	{
+		angularacceleration = sumTorque * invInertia;
+		angularvelocity += angularacceleration * dt;
+	}
+	else
+	{
+		return;
+	}
+
+	ClearForces();
+	ClearTorgue();
 
 }
 
-bool Body::isleft(int index, Vec2i point)
+void Body::IntegrateVelocities(const float dt)
 {
-	BoxShape* boxshape = (BoxShape*)shape;
-	int currVertex = index;
-	int nextVertex = (index + 1) % boxshape->worldvertices.size();
-
-	Vec2f worldV1 = boxshape->worldvertices[currVertex];
-	Vec2f worldV2 = boxshape->worldvertices[nextVertex];
-
 	
-	return (worldV2.x - worldV1.x) * (point.y - worldV1.y) - (worldV2.y - worldV1.y) * (point.x - worldV1.x) < 0;
+	if (!movementstatic)
+		position += velocity * dt;
+	else
+		return;
+
+	if (!rotationstatic)
+		rotation += angularvelocity * dt;
+	else
+		return;
+
+
+	shape->UpdateVertices(rotation, position);
 }
+

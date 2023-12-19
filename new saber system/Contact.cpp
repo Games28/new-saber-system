@@ -7,8 +7,12 @@ void Contact::ResolvePentration()
 	float da = depth / (a->invMass + b->invMass) * a->invMass;
 	float db = depth / (a->invMass + b->invMass) * b->invMass;
 
-	a->position -= normal * da;
-	b->position += normal * db;
+	a->position -= normal * da * 0.8f;
+	b->position += normal * db * 0.8f;
+
+
+	a->shape->UpdateVertices(a->rotation,a->position);
+	b->shape->UpdateVertices(b->rotation,b->position);
  }
 
 void Contact::ResolveCollision()
@@ -41,7 +45,7 @@ void Contact::ResolveCollision()
 
 	Vec2f J = jn + jt;
 
-	a->ApplyImpulse(J,ra);
-	b->ApplyImpulse(-J,rb);
+	a->ApplyImpulseAtPoint(J,ra);
+	b->ApplyImpulseAtPoint(-J,rb);
 
 }

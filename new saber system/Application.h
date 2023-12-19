@@ -8,6 +8,7 @@
 #include "CollisionDetection.h"
 #include "Contact.h"
 #include "ManipulatedSprite.h"
+#include "World.h"
 
 
 
@@ -36,6 +37,7 @@ public:
 	std::vector<LineData> LineData;
 	int bodynumber = 0;
 	int mousenumber = 0;
+	World* world;
 public:
 
 	void Setup();

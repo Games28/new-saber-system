@@ -1,14 +1,9 @@
 #ifndef  VEC2_H
 #define VEC2_H
 #include "olcPixelGameEngine.h"
-
-struct LineData
-{
-	int x, y;
-	olc::Pixel color;
+struct LineData {
+	float x, y;
 };
-
-
 template <class T>
 class Vec2
 {
