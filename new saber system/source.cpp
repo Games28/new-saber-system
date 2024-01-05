@@ -48,7 +48,7 @@ public:
 int main()
 {
 	physics_system demo;
-	if (demo.Construct(1200, 800, 1, 1))
+	if (demo.Construct(Graphics::width, Graphics::height, 1, 1))
 		demo.Start();
 
 	return 0;

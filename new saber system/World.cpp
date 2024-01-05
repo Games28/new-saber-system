@@ -14,6 +14,10 @@ World::~World()
 		delete body;
 	}
 
+	//for (auto constraint : constraints)
+	//{
+	//	delete constraint;
+	//}
 	std::cout << "world deconstructed!" << std::endl;
 }
 
@@ -49,7 +53,9 @@ std::vector<Constraint*>& World::GetConstraints()
 
 void World::Update(olc::PixelGameEngine* pge,float dt)
 {
-	for (auto body : bodies)
+	std::vector<PenetrationConstraint> penetrations;
+
+	for (auto& body : bodies)
 	{
 		Vec2f weight = Vec2f(0.0f, body->mass * G * PIXELS_PER_METER);
 		body->AddForce(weight);
@@ -65,15 +71,40 @@ void World::Update(olc::PixelGameEngine* pge,float dt)
 		}
 	}
 
-	for (auto body : bodies)
+	for (auto& body : bodies)
 	{
 		body->IntegrateForces(dt);
 
 	}
 
+	for (int i = 0; i <= bodies.size() - 1; i++)
+	{
+		for (int j = i + 1; j < bodies.size(); j++)
+		{
+			Body* a = bodies[i];
+			Body* b = bodies[j];
+			Contact contact;
+			
+			if (CollisionDetection::IsColliding(a, b, contact))
+			{
+				//contact.ResolveCollision();
+				PenetrationConstraint penetration(contact.a, contact.b, contact.start, contact.end, contact.normal);
+				penetrations.push_back(penetration);
+
+			}
+
+		}
+	}
+
+
 	for (auto& constraint : constraints)
 	{
 		constraint->PreSolve(dt);
+	}
+
+	for (auto& constraint : penetrations)
+	{
+		constraint.PreSolve(dt);
 	}
 
 	for (int i = 0; i < 5; i++)
@@ -82,18 +113,28 @@ void World::Update(olc::PixelGameEngine* pge,float dt)
 		{
 			constraint->Solve();
 		}
+
+		for (auto& constraint : penetrations)
+		{
+			constraint.Solve();
+		}
 	}
 	//for (auto& constraint : constraints)
 	//{
 	//	constraint->PostSolve();
 	//}
 
-	for (auto body : bodies)
+	//for (auto& constraint : penetrations)
+	//{
+	//	constraint.PostSolve();
+	//}
+
+	for (auto& body : bodies)
 	{
 		body->IntegrateVelocities(dt);
 	}
 	
-		CheckCollisions(pge);
+		//CheckCollisions(pge);
 	
 }
 

@@ -4,18 +4,21 @@ void Application::Setup()
 {
 	world = new World(-9.8f);
 
+	
+
+	
 	Body* bob = new Body(BoxShape(10, 10), Graphics::width / 2.0, Graphics::height / 2.0 - 200, 0.0);
-	Body* head = new Body(BoxShape(50, 50), bob->position.x, bob->position.y + 70, 5.0);
-	Body* torso = new Body(BoxShape(50, 100), head->position.x, head->position.y + 80, 3.0);
-	Body* lowertorso = new Body(BoxShape(50, 30), torso->position.x, torso->position.y + 70, 3.0f);
-	Body* leftArm = new Body(BoxShape(25, 70), torso->position.x - 32, torso->position.y - 10, 1.0);
-	Body* rightArm = new Body(BoxShape(25, 70), torso->position.x + 32, torso->position.y - 10, 1.0);
-	Body* leftLeg = new Body(BoxShape(30, 90), lowertorso->position.x - 20, lowertorso->position.y + 60, 1.0);
-	Body* rightLeg = new Body(BoxShape(30, 90), lowertorso->position.x + 20, lowertorso->position.y + 60, 1.0);
+	Body* head = new Body(BoxShape(50, 50), bob->position.x, bob->position.y + 70, 1.0);
+	Body* torso = new Body(BoxShape(50, 100), head->position.x, head->position.y + 80, 2.0);
+	Body* lowertorso = new Body(BoxShape(50, 30), torso->position.x, torso->position.y + 70, 2.0f);
+	Body* leftArm = new Body(BoxShape(25, 70), torso->position.x - 40, torso->position.y - 10, 2.0);
+	Body* rightArm = new Body(BoxShape(25, 70), torso->position.x + 40, torso->position.y - 10, 2.0);
+	Body* leftLeg = new Body(BoxShape(30, 90), lowertorso->position.x - 20, lowertorso->position.y + 60, 2.0);
+	Body* rightLeg = new Body(BoxShape(30, 90), lowertorso->position.x + 20, lowertorso->position.y + 60, 2.0);
 	//bob->SetTexture("bob.png");
 	
 	head->SetTexture("mandohead.png");
-
+	
 	torso->SetTexture("mandotorse.png");
 	lowertorso->SetTexture("mandolowertorso.png");
 	leftArm->SetTexture("mandoleftArm.png");
@@ -30,7 +33,7 @@ void Application::Setup()
 	world->AddBody(rightArm);
 	world->AddBody(leftLeg);
 	world->AddBody(rightLeg);
-
+	
 	// Add joints between ragdoll parts (distance constraints with one anchor point)
 	JointConstraint* string = new JointConstraint(bob, head, bob->position);
 	JointConstraint* neck = new JointConstraint(head, torso, head->position + Vec2f(0, 25));
@@ -47,7 +50,7 @@ void Application::Setup()
 	world->AddConstraint(waist);
 	world->AddConstraint(leftHip);
 	world->AddConstraint(rightHip);
-
+	
 	// Add a floor and walls to contain objects objects
 	Body* floor = new Body(BoxShape(Graphics::width - 50, 50), Graphics::width / 2.0, Graphics::height - 50, 0.0);
 	Body* leftWall = new Body(BoxShape(50, Graphics::height - 100), 50, Graphics::height / 2.0 - 25, 0.0);
@@ -66,56 +69,49 @@ void Application::Setup()
 void Application::Input(olc::PixelGameEngine* ptr)
 {
 	if (ptr->GetKey(olc::W).bHeld)
-		Bodies[saberindex]->velocity.y = -50;
+		world->GetBodies()[bodynumber]->velocity.y = -400;
 	if (ptr->GetKey(olc::S).bHeld)
-		Bodies[saberindex]->velocity.y = +50;
+		world->GetBodies()[bodynumber]->velocity.y = +400;
 	if (ptr->GetKey(olc::A).bHeld)
-		Bodies[saberindex]->velocity.x = -50;
+		world->GetBodies()[bodynumber]->velocity.x = -400;
 	if (ptr->GetKey(olc::D).bHeld)
-		Bodies[saberindex]->velocity.x = +50;
+		world->GetBodies()[bodynumber]->velocity.x = +400;
 
 	if (ptr->GetKey(olc::W).bReleased)
-		Bodies[saberindex]->velocity.y = 0;
+		world->GetBodies()[bodynumber]->velocity.y = 0;
 	if (ptr->GetKey(olc::S).bReleased)
-		Bodies[saberindex]->velocity.y = 0;
+		world->GetBodies()[bodynumber]->velocity.y = 0;
 	if (ptr->GetKey(olc::A).bReleased)
-		Bodies[saberindex]->velocity.x = 0;
+		world->GetBodies()[bodynumber]->velocity.x = 0;
 	if (ptr->GetKey(olc::D).bReleased)
-		Bodies[saberindex]->velocity.x = 0;
+		world->GetBodies()[bodynumber]->velocity.x = 0;
     
-	if (ptr->GetKey(olc::LEFT).bHeld)  
-		Bodies[saberindex]->angularvelocity = -1.0;
-	if (ptr->GetKey(olc::RIGHT).bHeld) 
-		Bodies[saberindex]->angularvelocity = 1.0;
-
 	
-	if (ptr->GetKey(olc::LEFT).bReleased)  Bodies[saberindex]->angularvelocity = 0;//pushForce.x = 0;
-	if (ptr->GetKey(olc::RIGHT).bReleased) Bodies[saberindex]->angularvelocity = 0;//pushForce.x = 0;
+	
+	if (ptr->GetKey(olc::F1).bPressed) bodynumber = 0;
+	if (ptr->GetKey(olc::F2).bPressed) bodynumber = 1;
+	if (ptr->GetKey(olc::F3).bPressed) bodynumber = 2;
+	
+	if (ptr->GetKey(olc::LEFT).bReleased)  world->GetBodies()[bodynumber]->angularvelocity = 0;//pushForce.x = 0;
+	if (ptr->GetKey(olc::RIGHT).bReleased) world->GetBodies()[bodynumber]->angularvelocity = 0;//pushForce.x = 0;
 	if (ptr->GetKey(olc::D).bPressed) debug = !debug;
 	if (ptr->GetMouse(0).bPressed)
 	{
 		int x = ptr->GetMouseX();
 		int y = ptr->GetMouseY();
-		std::vector<Vec2f> vertices =
-		{
-			Vec2f(20,60),
-			Vec2f(-40,20),
-			Vec2f(-20,-60),
-			Vec2f(20, -60),
-			Vec2f(40,20)
-		};
-		Body* poly = new Body(PolygonShape(vertices), x, y, 2.0);
+		
+		Body* poly = new Body(BoxShape(50,50), x, y, 2.0);
 		//poly->restitution = 0.1f;
 		poly->friction = 0.7f;
 		
-		Bodies.push_back(poly);
+		world->AddBody(poly);
 	}
 
-	Vec2f mouse = Vec2f((int)ptr->GetMouseX(), (int)ptr->GetMouseY());
-	Body* bob = world->GetBodies()[0];
-	Vec2f direction = (mouse - bob->position).Normalize();
-	float speed = 5.0f;
-	bob->position += direction * speed;
+	//Vec2f mouse = Vec2f((int)ptr->GetMouseX(), (int)ptr->GetMouseY());
+	//Body* bob = world->GetBodies()[0];
+	//Vec2f direction = (mouse - bob->position).Normalize();
+	//float speed = 5.0f;
+	//bob->position += direction * speed;
 	
 }
 
@@ -143,7 +139,7 @@ void Application::Render(olc::PixelGameEngine* ptr)
 		const Vec2f pa = joint->a->LocalSpaceToWorldSpace(joint->aPoint);
 		const Vec2f pb = joint->b->LocalSpaceToWorldSpace(joint->bPoint);
 		Graphics::DrawLine(ptr, pa.x, pa.y, pb.x, pb.y, 0xff555555);
-
+	
 	}
 	
 	for (auto& body : world->GetBodies())
@@ -181,7 +177,7 @@ void Application::Render(olc::PixelGameEngine* ptr)
 			//}
 			
 			
-			//Graphics::DrawPolygon(ptr, body->position.x, body->position.y, boxShape->worldvertices, 0xff00ff00);
+			Graphics::DrawPolygon(ptr, body->position.x, body->position.y, boxShape->worldvertices, 0xff00ff00);
 			
 			
 		}

@@ -39,8 +39,18 @@ public:
 
 class PenetrationConstraint : public Constraint
 {
+private:
 	MatMN jacobian;
+	VecN cachedLambda;
+	float bias;
+	Vec2f normal;
 
+public:
+	PenetrationConstraint();
+	PenetrationConstraint(Body* a, Body* b, const Vec2f& aCollisionPoint, Vec2f& bCollisionPoint,const Vec2f& normal);
+	void PreSolve(const float dt) override;
+	void Solve() override;
+	void PostSolve() override;
 };
 
 #endif // !CONSTRAINT_H

@@ -7,7 +7,7 @@
 struct Graphics
 {
     static const int width = 1200;
-    static const int height = 800;
+    static const int height = 1300;
     static void DrawLine(olc::PixelGameEngine* pge,int x0, int y0, int x1, int y1, uint32_t color);
     static void DrawLineWithData(olc::PixelGameEngine* pge, int x0, int y0, int x1, int y1, uint32_t color, std::vector<LineData>& linedata);
     static void DrawCircle(olc::PixelGameEngine* pge, int x, int y, int radius, float angle, uint32_t color);

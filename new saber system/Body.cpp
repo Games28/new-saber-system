@@ -7,6 +7,7 @@ Body::Body(const Shape& shape,float x, float y, float mass)
 	
 	//linear motion
 	this->position = Vec2f(x, y);
+	this->old_position = Vec2f(x, y);
 	this->velocity = Vec2f(0, 0);
 	this->acceleration = Vec2f(0, 0);
 	//angular motion
@@ -126,6 +127,7 @@ void Body::IntegrateForces(const float dt)
 	{
 		acceleration = sumForces * invMass;
 		velocity += acceleration * dt;
+		
 	}
 	else
 	{

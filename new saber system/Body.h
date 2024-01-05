@@ -8,6 +8,7 @@ struct Body
 	//linear stuff
 	bool isColliding = false;
 	Vec2f position;
+	Vec2f old_position;
 	Vec2f velocity;
 	Vec2f acceleration;
 	Vec2f sumForces;
